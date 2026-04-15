@@ -1,0 +1,83 @@
+CREATE DATABASE ecommerce;
+USE ecommerce;
+CREATE TABLE sales_date(
+id INT,
+date DATE,
+region VARCHAR(50),
+channel VARCHAR(50),
+product_category VARCHAR(50),
+    customer_segment VARCHAR(50),
+    ad_spend DECIMAL(10,2),
+    price DECIMAL(10,2),
+    discount_rate DECIMAL(5,2),
+    market_reach INT,
+    impressions INT,
+    click_through_rate DECIMAL(5,4),
+    competition_index DECIMAL(5,2),
+    seasonality_index DECIMAL(5,2),
+    campaign_duration_days INT,
+    customer_lifetime_value DECIMAL(10,2)
+    );
+SELECT region,
+SUM(price * (1-discount_rate)) AS Netrevenue
+FROM sales_date
+GROUP BY region;
+SELECT region, channel,
+SUM(price * (1 - discount_rate)) AS Channelrevenue
+FROM sales_date
+GROUP BY region, channel;
+SELECT region, channel,
+       SUM(price * (1 - discount_rate)) AS ChannelRevenue
+FROM sales_date
+GROUP BY region, channel
+ORDER BY ChannelRevenue DESC
+LIMIT 5;
+SELECT DATE_FORMAT(date, '%Y-%m') AS Month, region, channel,
+       SUM(price * (1 - discount_rate)) AS MonthlyRevenue
+FROM sales_date
+GROUP BY Month, region, channel
+ORDER BY Month;
+SELECT DATE_FORMAT(date, '%Y-%m') AS Month, region, channel,
+       SUM(price * (1 - discount_rate)) AS MonthlyRevenue
+FROM sales_date
+GROUP BY Month, region, channel
+ORDER BY MonthlyRevenue DESC
+LIMIT 5;
+SELECT region, channel,
+       SUM(ad_spend) AS TotalAdSpend,
+       SUM(price * (1 - discount_rate)) AS TotalRevenue,
+       (SUM(price * (1 - discount_rate)) / SUM(ad_spend)) AS ROI
+FROM sales_date
+GROUP BY region, channel
+ORDER BY ROI DESC;
+SELECT product_category,
+SUM(price * (1 - discount_rate)) AS CategoryRevenue
+FROM sales_date
+GROUP BY product_category
+ORDER BY CategoryRevenue DESC
+LIMIT 5;
+SELECT customer_segment,
+       AVG(customer_lifetime_value) AS AvgCLV,
+       SUM(price * (1 - discount_rate)) AS SegmentRevenue
+FROM sales_date
+GROUP BY customer_segment
+ORDER BY SegmentRevenue DESC;
+SELECT customer_segment,
+       AVG(customer_lifetime_value) AS AvgCLV,
+       SUM(customer_lifetime_value) AS TotalCLV,
+       SUM(price * (1 - discount_rate)) AS SegmentRevenue
+FROM sales_date
+GROUP BY customer_segment
+ORDER BY SegmentRevenue DESC;
+SELECT seasonality_index,
+       AVG(price * (1 - discount_rate)) AS AvgRevenue
+FROM sales_date
+GROUP BY seasonality_index
+ORDER BY seasonality_index;
+SELECT channel,
+       SUM(ad_spend) AS TotalAdSpend,
+       SUM(price * (1 - discount_rate)) AS TotalRevenue,
+       (SUM(price * (1 - discount_rate)) / SUM(ad_spend)) AS ROI
+FROM sales_date
+GROUP BY channel
+ORDER BY ROI DESC;
